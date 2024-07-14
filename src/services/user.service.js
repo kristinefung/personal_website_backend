@@ -41,11 +41,13 @@ module.exports = {
 
         // Step 3: Insert user into database
         var statusId = 1; // NOT_VERIFIED
+        var roleId = 2; // Normal User
         var dbUserId = await userRepo.createUser({
             username: user.username,
             displayName: user.display_name,
             password: hashedPw,
             salt: salt,
+            roleId: roleId,
             statusId: statusId
         });
 

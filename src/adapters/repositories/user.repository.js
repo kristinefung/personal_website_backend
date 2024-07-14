@@ -37,17 +37,17 @@ module.exports = {
 
         return results[0];
     },
-    createUser: async ({ username, displayName, password, salt, statusId }) => {
+    createUser: async ({ username, displayName, password, salt, roleId, statusId }) => {
         var now = new Date();
         var query = `INSERT INTO user 
-                        (username, display_name, password, salt, status_id, created_at, updated_at) 
-                        VALUES(?,?,?,?,?,?,?)`;
-        var values = [username, displayName, password, salt, statusId, now, now];
+                        (username, display_name, password, salt, role_id, status_id, created_at, updated_at) 
+                        VALUES(?,?,?,?,?,?,?,?)`;
+        var values = [username, displayName, password, salt, roleId, statusId, now, now];
 
         var results = await connectMysql(query, values);
         return results.insertId;
     },
-    updateUserById: async ({ id, username = null, displayName = null, password = null, salt = null, statusId = null, deleted = null }) => {
+    updateUserById: async ({ id, username = null, displayName = null, password = null, salt = null, roleId = null, statusId = null, deleted = null }) => {
         var now = new Date();
 
         var query = `UPDATE user
@@ -56,11 +56,12 @@ module.exports = {
                             display_name = COALESCE(?, display_name), 
                             password = COALESCE(?, password), 
                             salt = COALESCE(?, salt), 
+                            role_id = COALESCE(?, role_id), 
                             status_id = COALESCE(?, status_id), 
                             updated_at = ?,
                             deleted = COALESCE(?, deleted)
                         WHERE id = ?`;
-        var values = [username, displayName, password, salt, statusId, now, deleted, id];
+        var values = [username, displayName, password, salt, roleId, statusId, now, deleted, id];
 
         var results = await connectMysql(query, values);
         console.log(results);

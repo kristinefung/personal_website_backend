@@ -1,6 +1,6 @@
 {
   "name": "personal_website_backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "my personal website sallyfunghk.com",
   "main": "app.js",
   "scripts": {
