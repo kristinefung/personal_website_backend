@@ -19,7 +19,7 @@ module.exports = {
 
         var hasPermission = false
         var userActions = await userServ.getUserActionsByUserId(payload.userId)
-        if (userActions.status) {
+        if (userActions.error) {
             return false;
         }
 
