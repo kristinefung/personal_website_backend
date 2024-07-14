@@ -57,14 +57,14 @@ module.exports = {
 
         // Verify is valid token
         jwt.verify(token, secretKey, (err, decoded) => {
-            if (err) return payload;
+            if (err) return;
 
             payload = decoded;
         })
 
         // Check token existed in database
         var t = await userSessionTokenRepo.getUserSessionTokenByToken(token);
-        if (!t) return payload;
+        if (!t) return;
 
         return payload;
     },
