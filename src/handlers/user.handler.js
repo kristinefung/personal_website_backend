@@ -19,7 +19,7 @@ module.exports = {
             res.status(200).json(dataToResp(0, "Success", data));
 
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -36,7 +36,7 @@ module.exports = {
             }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -48,7 +48,7 @@ module.exports = {
             }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -65,7 +65,7 @@ module.exports = {
             }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -82,7 +82,7 @@ module.exports = {
             }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -95,7 +95,7 @@ module.exports = {
             var data = { "user_session_token": token }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     },
@@ -112,7 +112,7 @@ module.exports = {
             }
             return res.status(200).json(dataToResp(0, "Success", {}));
         } catch (err) {
-            console.log(err.message);
+            console.error(err.message);
             return res.status(500).json();
         }
     }
