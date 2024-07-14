@@ -4,10 +4,8 @@ module.exports = {
     getUserSessionTokenByToken: async (token) => {
         var query = "SELECT * from `user_session_token` WHERE `token` = ?";
         var values = [token];
-        console.log(query);
 
         var results = await connectMysql(query, values);
-        console.log(results);
 
         return results[0];
     },

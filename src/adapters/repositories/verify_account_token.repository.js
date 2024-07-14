@@ -2,11 +2,10 @@ const { connectMysql } = require('../../middleware/db_connection');
 
 module.exports = {
     getVerifyAccountTokenByToken: async (token) => {
-        var query = "SELECT * from `verify_account_token` WHERE `token` = ?";
+        var query = "SELECT * from `verify_account_token` WHERE `token` = ? AND deleted = 0";
         var values = [token];
 
         var results = await connectMysql(query, values);
-        console.log(results);
 
         return results[0];
     },
@@ -18,5 +17,17 @@ module.exports = {
 
         var results = await connectMysql(query, values);
         return results.insertId;
-    }
+    },
+    updateVerifyAccountTokenByToken: async (token, deleted = null) => {
+        var now = new Date();
+        var query = `UPDATE verify_account_token
+        SET 
+            updated_at = ?,
+            deleted = COALESCE(?, deleted)
+        WHERE token = ?`;
+        var values = [now, deleted, token];
+
+        var results = await connectMysql(query, values);
+        return results[0];
+    },
 }

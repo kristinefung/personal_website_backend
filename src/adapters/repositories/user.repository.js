@@ -10,7 +10,6 @@ module.exports = {
         }
 
         var results = await connectMysql(query);
-        console.log(results);
 
         return results;
     },
@@ -24,7 +23,6 @@ module.exports = {
         var values = [userId];
 
         var results = await connectMysql(query, values);
-        console.log(results);
 
         return results[0];
     },
@@ -33,7 +31,6 @@ module.exports = {
         var values = [username];
 
         var results = await connectMysql(query, values);
-        console.log(results);
 
         return results[0];
     },
@@ -64,7 +61,6 @@ module.exports = {
         var values = [username, displayName, password, salt, roleId, statusId, now, deleted, id];
 
         var results = await connectMysql(query, values);
-        console.log(results);
         return results;
     }
 }

@@ -92,9 +92,25 @@ module.exports = {
             if (token.error) {
                 return res.status(200).json(dataToResp(token.error, token.message, {}));
             }
-            console.log(typeof token)
             var data = { "user_session_token": token }
             return res.status(200).json(dataToResp(0, "Success", data));
+        } catch (err) {
+            console.log(err.message);
+            return res.status(500).json();
+        }
+    },
+    verifyUser: async (req, res) => {
+        try {
+            var { t } = req.query;
+            if (!t) {
+                return res.status(404).json();
+            }
+
+            var data = await userServ.verifyUser(t);
+            if (data.error) {
+                return res.status(200).json(dataToResp(data.error, data.message, {}));
+            }
+            return res.status(200).json(dataToResp(0, "Success", {}));
         } catch (err) {
             console.log(err.message);
             return res.status(500).json();

@@ -91,22 +91,49 @@ module.exports = {
         // Step 1: Check if username and password are correct
         var dbUser = await userRepo.getUserByUsername(user.username);
         if (!dbUser) {
-            return { error: 21, message: 'username or password is incorrect' };
+            return { error: 21, message: 'username or password incorrect' };
         }
 
         var pw = user.password + dbUser.salt;
         var pwCorrect = await bcrypt.compare(pw, dbUser.password)
         if (!pwCorrect) {
-            return { error: 21, message: 'username or password is incorrect' };
+            return { error: 21, message: 'username or password incorrect' };
         }
 
-        // TODO: Check if user status is active
+        // Step 2: Check if user status is active
+        switch (dbUser.status_id) {
+            case 1:
+                return { error: 22, message: 'please verify your user account' };
+            default:
+                if (dbUser.status_id !== 0) {
+                    return { error: 23, message: 'invalid user' };
+                }
+        }
 
-        // Step 2: Generate user session token
-        var token = tokenServ.generateUserSessionToken(dbUser.id);
+        // Step 3: Generate user session token
+        var token = await tokenServ.generateUserSessionToken(dbUser.id);
 
-        // Step 3: Return token to user
+        // Step 4: Return token to user
         return token;
+    },
+    verifyUser: async (token) => {
+        // Step 1: Verify token
+        var t = await tokenServ.verifyVerifyAccountToken(token);
+        if (!t) {
+            return { error: 11, message: 'invalid token' };
+        }
+
+        // Step 2: Update user status to active
+        var userId = t.user_id;
+        var user = await userRepo.updateUserById({
+            id: userId,
+            statusId: 0 // ACTIVE
+        });
+        if (!user) {
+            return { error: 99, message: 'Unknow Error: cannnot update user by id' };
+        }
+
+        return user;
     },
     getUserActionsByUserId: async (userId) => {
         // Step 0: Data validation
@@ -116,14 +143,12 @@ module.exports = {
 
         var user = await userRepo.getUserById(userId);
         if (!user) {
-            return { error: 99, message: 'cannnot get user by id' };
+            return { error: 99, message: 'Unknow Error: cannnot get user by id' };
         }
 
         var roleId = user.role_id;
-        console.log(user);
         var userActions = await userActionRepo.getUserActionsByRoleId(roleId);
 
-        console.log(userActions);
         return userActions;
     },
 
