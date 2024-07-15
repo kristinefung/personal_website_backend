@@ -2,36 +2,36 @@ const { connectMysql } = require('../../middleware/db_connection');
 
 module.exports = {
     getAllEnquiries: async () => {
-        var query = `SELECT * from enquiry WHERE deleted = 0`;
-        var values = [];
+        const query = `SELECT * from enquiry WHERE deleted = 0`;
+        const values = [];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
 
         return results;
     },
     getEnquiryById: async (id) => {
-        var query = `SELECT * from enquiry 
+        const query = `SELECT * from enquiry 
                         WHERE id = ? 
                         AND deleted = 0`;
-        var values = [id];
+        const values = [id];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
 
-        return results[0];
+        return results.length > 0 ? results[0] : {};
     },
     createEnquiry: async ({ name, email, companyName, phoneNo, comment, statusId }) => {
-        var now = new Date();
+        const now = new Date();
 
-        var query = "INSERT INTO `enquiry` (name, email, company_name, phone_no, comment, status_id, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?)";
-        var values = [name, email, companyName, phoneNo, comment, statusId, now, now];
+        const query = "INSERT INTO `enquiry` (name, email, company_name, phone_no, comment, status_id, created_at, updated_at) VALUES(?,?,?,?,?,?,?,?)";
+        const values = [name, email, companyName, phoneNo, comment, statusId, now, now];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
         return results.insertId;
     },
     updateEnquiryById: async ({ id = null, name = null, email = null, companyName = null, phoneNo = null, comment = null, statusId = null, deleted = null }) => {
-        var now = new Date();
+        const now = new Date();
 
-        var query = `UPDATE enquiry
+        const query = `UPDATE enquiry
                         SET 
                             name = COALESCE(?, name), 
                             email = COALESCE(?, email), 
@@ -42,9 +42,9 @@ module.exports = {
                             updated_at = ?,
                             deleted = COALESCE(?, deleted)
                         WHERE id = ?`;
-        var values = [name, email, companyName, phoneNo, comment, statusId, now, deleted, id];
+        const values = [name, email, companyName, phoneNo, comment, statusId, now, deleted, id];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
         return results;
     }
 }

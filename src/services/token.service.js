@@ -9,15 +9,15 @@ const secretKey = process.env.JWT_SECRET_KEY;
 module.exports = {
     generateVerifyAccountToken: async (userId) => {
         // Step 1: Generate token
-        var length = Math.floor(Math.random() * 11) + 50; // token length random from 50 - 60
-        var token = getRandomString(length);
+        const length = Math.floor(Math.random() * 11) + 50; // token length random from 50 - 60
+        const token = getRandomString(length);
 
         // Step 2: Set expiry time to 2 hours
-        var expiredAt = new Date();
+        const expiredAt = new Date();
         expiredAt.setHours(expiredAt.getHours() + 2);
 
         // Step 3: Insert token record into database
-        var tokenId = await verifyAccountTokenRepo.createVerifyAccountToken(userId, token, expiredAt);
+        const tokenId = await verifyAccountTokenRepo.createVerifyAccountToken(userId, token, expiredAt);
 
         return token;
     },
@@ -27,45 +27,50 @@ module.exports = {
             exp: Math.floor(Date.now() / 1000) + (60 * 60 * 3) // Token expires in 3 hours
         };
 
-        var token = jwt.sign(payload, secretKey);
+        const token = jwt.sign(payload, secretKey);
 
-        var tokenId = await userSessionTokenRepo.createUserSessionToken(userId, token);
+        const tokenId = await userSessionTokenRepo.createUserSessionToken(userId, token);
 
         return token;
     },
     verifyVerifyAccountToken: async (token) => {
         // Step 1: Check if token existed 
-        var t = await verifyAccountTokenRepo.getVerifyAccountTokenByToken(token);
+        const t = await verifyAccountTokenRepo.getVerifyAccountTokenByToken(token);
         if (!t) {
             return;
         }
 
         // Step 2: Check token not expired
-        var now = new Date().getTime();
-        var expiredAt = new Date(t.expired_at).getTime();
+        const now = new Date().getTime();
+        const expiredAt = new Date(t.expired_at).getTime();
         if (now >= expiredAt) {
             return;
         }
 
         // Step 3: Update token to deleted
-        var updatedToken = await verifyAccountTokenRepo.updateVerifyAccountTokenByToken(token, 1);
+        const updatedToken = await verifyAccountTokenRepo.updateVerifyAccountTokenByToken(token, 1);
 
         return t;
     },
     verifyUserSessionToken: async (token) => {
-        var payload;
-
+        console.log(token);
+        console.log(secretKey);
         // Verify is valid token
-        jwt.verify(token, secretKey, (err, decoded) => {
-            if (err) return;
+        const payload = jwt.verify(token, secretKey, (err, decoded) => {
+            if (err) {
+                console.error(err.message);
+                return;
+            }
 
-            payload = decoded;
+            return decoded;
         })
+        console.log(payload);
 
         // Check token existed in database
-        var t = await userSessionTokenRepo.getUserSessionTokenByToken(token);
+        const t = await userSessionTokenRepo.getUserSessionTokenByToken(token);
         if (!t) return;
 
+        console.log(payload);
         return payload;
     },
 }

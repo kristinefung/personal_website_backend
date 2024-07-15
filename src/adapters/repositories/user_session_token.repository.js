@@ -2,20 +2,19 @@ const { connectMysql } = require('../../middleware/db_connection');
 
 module.exports = {
     getUserSessionTokenByToken: async (token) => {
-        var query = "SELECT * from `user_session_token` WHERE `token` = ?";
-        var values = [token];
+        const query = "SELECT * from `user_session_token` WHERE `token` = ?";
+        const values = [token];
+        const results = await connectMysql(query, values);
 
-        var results = await connectMysql(query, values);
-
-        return results[0];
+        return results.length > 0 ? results[0] : {};
     },
     createUserSessionToken: async (userId, token) => {
-        var now = new Date();
+        const now = new Date();
 
-        var query = "INSERT INTO `user_session_token` (user_id, token, created_at, updated_at) VALUES(?,?,?,?)";
-        var values = [userId, token, now, now];
+        const query = "INSERT INTO `user_session_token` (user_id, token, created_at, updated_at) VALUES(?,?,?,?)";
+        const values = [userId, token, now, now];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
         return results.insertId;
     }
 }

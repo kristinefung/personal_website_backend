@@ -2,52 +2,53 @@ const { connectMysql } = require('../../middleware/db_connection');
 
 module.exports = {
     getAllUsers: async (inclPw = false) => {
-        var query = '';
+        let query = '';
         if (inclPw) {
             query = `SELECT * from user WHERE deleted = 0`;
         } else {
             query = `SELECT id, username, display_name, role_id, status_id, created_at, updated_at, deleted from user WHERE deleted = 0`;
         }
 
-        var results = await connectMysql(query);
+        const results = await connectMysql(query);
 
         return results;
     },
     getUserById: async (userId, inclPw = false) => {
-        var query = '';
+        let query = '';
         if (inclPw) {
             query = `SELECT * from user WHERE id = ? AND deleted = 0`;
         } else {
             query = `SELECT id, username, display_name, role_id, status_id, created_at, updated_at, deleted from user WHERE id = ? AND deleted = 0`;
         }
-        var values = [userId];
+        const values = [userId];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
+        console.log(results);
 
-        return results[0];
+        return results.length > 0 ? results[0] : {};
     },
     getUserByUsername: async (username) => {
-        var query = `SELECT * from user WHERE username = ? AND deleted = 0`;
-        var values = [username];
+        const query = `SELECT * from user WHERE username = ? AND deleted = 0`;
+        const values = [username];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
 
-        return results[0];
+        return results.length > 0 ? results[0] : {};
     },
     createUser: async ({ username, displayName, password, salt, roleId, statusId }) => {
-        var now = new Date();
-        var query = `INSERT INTO user 
+        const now = new Date();
+        const query = `INSERT INTO user 
                         (username, display_name, password, salt, role_id, status_id, created_at, updated_at) 
                         VALUES(?,?,?,?,?,?,?,?)`;
-        var values = [username, displayName, password, salt, roleId, statusId, now, now];
+        const values = [username, displayName, password, salt, roleId, statusId, now, now];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
         return results.insertId;
     },
     updateUserById: async ({ id, username = null, displayName = null, password = null, salt = null, roleId = null, statusId = null, deleted = null }) => {
-        var now = new Date();
+        const now = new Date();
 
-        var query = `UPDATE user
+        const query = `UPDATE user
                         SET 
                             username = COALESCE(?, username), 
                             display_name = COALESCE(?, display_name), 
@@ -58,9 +59,9 @@ module.exports = {
                             updated_at = ?,
                             deleted = COALESCE(?, deleted)
                         WHERE id = ?`;
-        var values = [username, displayName, password, salt, roleId, statusId, now, deleted, id];
+        const values = [username, displayName, password, salt, roleId, statusId, now, deleted, id];
 
-        var results = await connectMysql(query, values);
+        const results = await connectMysql(query, values);
         return results;
     }
 }

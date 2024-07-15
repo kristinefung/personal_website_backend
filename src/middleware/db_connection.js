@@ -7,6 +7,11 @@ const mysqlPool = createPool({
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
+    // host: 'rds-uat-sallyfunghk.ctegcsoq0n0z.us-east-1.rds.amazonaws.com',
+    // port: 3306,
+    // user: 'admin',
+    // password: 'MFU4Ca85I9yl7TniFx55j9Dqim4L8qWSoPyGTj',
+    // database: 'personal_website',
     waitForConnections: true,
     connectionLimit: 3,
     maxIdle: 3, // max idle connections, the default value is the same as `connectionLimit`
@@ -18,11 +23,11 @@ const mysqlPool = createPool({
 
 const connectMysql = async (query, values = null) => {
     var results;
-    var connection;
+    const connection = await mysqlPool.getConnection();
+    console.log(results);
 
     try {
         // Getting a connection from the pool
-        connection = await mysqlPool.getConnection();
         [results,] = await connection.execute(query, values);
     } catch (error) {
         console.error('Error executing query:', error);
@@ -32,6 +37,7 @@ const connectMysql = async (query, values = null) => {
         // Don't forget to release the connection when finished!
         if (connection) connection.release();
     }
+    console.log(results);
 
     return results;
 }

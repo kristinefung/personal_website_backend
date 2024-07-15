@@ -25,4 +25,8 @@ router.get('/enquiries/:id', enquiryHdlr.getEnquiryById);
 router.put('/enquiries/:id', enquiryHdlr.updateEnquiryById);
 router.delete('/enquiries/:id', enquiryHdlr.deleteEnquiryById);
 
+/***************************************************
+ *                Work Module
+ **************************************************/
+
 module.exports = router;

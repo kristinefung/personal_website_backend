@@ -11,7 +11,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await userServ.getAllUsers();
+            const data = await userServ.getAllUsers();
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -30,7 +30,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await userServ.getUserById(req.params.id);
+            const data = await userServ.getUserById(req.params.id);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -42,7 +42,7 @@ module.exports = {
     },
     createUser: async (req, res) => {
         try {
-            var data = await userServ.createUser(req.body);
+            const data = await userServ.createUser(req.body);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -59,11 +59,11 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await userServ.updateUserById(req.params.id, req.body);
+            const data = await userServ.updateUserById(req.params.id, req.body);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
-            return res.status(200).json(dataToResp(0, "Success", data));
+            return res.status(200).json(dataToResp(0, "Success", {}));
         } catch (err) {
             console.error(err.message);
             return res.status(500).json();
@@ -76,7 +76,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await userServ.deleteUserById(req.params.id);
+            const data = await userServ.deleteUserById(req.params.id);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -88,11 +88,11 @@ module.exports = {
     },
     login: async (req, res) => {
         try {
-            var token = await userServ.login(req.body);
+            const token = await userServ.login(req.body);
             if (token.error) {
                 return res.status(200).json(dataToResp(token.error, token.message, {}));
             }
-            var data = { "user_session_token": token }
+            const data = { "user_session_token": token }
             return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
             console.error(err.message);
@@ -101,12 +101,12 @@ module.exports = {
     },
     verifyUser: async (req, res) => {
         try {
-            var { t } = req.query;
+            const { t } = req.query;
             if (!t) {
                 return res.status(404).json();
             }
 
-            var data = await userServ.verifyUser(t);
+            const data = await userServ.verifyUser(t);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }

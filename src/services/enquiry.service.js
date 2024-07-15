@@ -3,7 +3,7 @@ const enquiryRepo = require('../adapters/repositories/enquiry.repository');
 
 module.exports = {
     getAllEnquiries: async () => {
-        var enquiries = await enquiryRepo.getAllEnquiries();
+        const enquiries = await enquiryRepo.getAllEnquiries();
 
         return enquiries;
     },
@@ -13,7 +13,10 @@ module.exports = {
             return { error: 10, message: 'username, enquiryId is required' };
         }
 
-        var enquiry = await enquiryRepo.getEnquiryById(enquiryId);
+        const enquiry = await enquiryRepo.getEnquiryById(enquiryId);
+        if (Object.keys(enquiry).length == 0) {
+            return { error: 12, message: 'no enquiry found' };
+        }
 
         return enquiry;
     },
@@ -24,8 +27,8 @@ module.exports = {
         }
 
         // Step 1: Insert enquiry into database
-        var statusId = 1; // NOT_HANDLED
-        var dbEnquiryId = await enquiryRepo.createEnquiry({
+        const statusId = 1; // NOT_HANDLED
+        const dbEnquiryId = await enquiryRepo.createEnquiry({
             name: enquiry.name,
             email: enquiry.email,
             companyName: enquiry.company_name ?? "",
@@ -42,11 +45,11 @@ module.exports = {
     },
     updateEnquiryById: async (id, enquiry) => {
         // Step 0: Data validation
-        if (!enquiry.id) {
+        if (!id) {
             return { error: 10, message: 'id is required' };
         }
 
-        var resp = await enquiryRepo.updateEnquiryById({
+        const resp = await enquiryRepo.updateEnquiryById({
             id: id,
             statusId: enquiry.status_id,
         });
@@ -59,7 +62,7 @@ module.exports = {
             return { error: 10, message: 'id is required' };
         }
 
-        var resp = await enquiryRepo.updateEnquiryById({
+        const resp = await enquiryRepo.updateEnquiryById({
             id: id,
             deleted: 1,
         });

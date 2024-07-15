@@ -7,6 +7,7 @@ module.exports = {
             // Common error
             ["10", "INVALID_PARAM"],
             ["11", "INVALID_TOKEN"],
+            ["12", "RECORD_NOT_EXISTED"],
             // User related
             ["20", "USER_EXISTED"],
             ["21", "INCORRECT_CREDENTIAL"],
@@ -14,7 +15,6 @@ module.exports = {
             ["23", "INVALID_USER"],
         ]);
 
-        var statusCode = statusCodes.get(status + "");
-        return statusCode;
+        return statusCodes.get(status + "");
     }
 }

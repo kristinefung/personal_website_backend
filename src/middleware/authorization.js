@@ -4,32 +4,38 @@ const userServ = require('../services/user.service');
 module.exports = {
     userAuth: async (authHeader, action) => {
         if (!authHeader) {
+            console.log("!authHeader");
             return false;
         }
 
-        var token = authHeader.split(' ')[1];
+        const token = authHeader.split(' ')[1];
         if (!token) {
+            console.log("!token");
             return false;
         }
 
-        var payload = await tokenServ.verifyUserSessionToken(token);
+        const payload = await tokenServ.verifyUserSessionToken(token);
         if (!payload) {
+            console.log("!payload");
             return false;
         }
 
-        var hasPermission = false
-        var userActions = await userServ.getUserActionsByUserId(payload.userId)
+        const userActions = await userServ.getUserActionsByUserId(payload.userId)
         if (userActions.error) {
+            console.log("userActions.error");
             return false;
         }
 
+        var hasPermission = false;
         userActions.forEach((userAction) => {
             if (userAction.action === action) {
+                console.log("userAction.action === action");
                 hasPermission = true;
                 return;
             }
         });
         if (!hasPermission) {
+            console.log("!hasPermission");
             return false;
         }
 

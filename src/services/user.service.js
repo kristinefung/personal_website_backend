@@ -8,7 +8,7 @@ const { getRandomString } = require('../utils/common');
 
 module.exports = {
     getAllUsers: async () => {
-        var users = await userRepo.getAllUsers();
+        const users = await userRepo.getAllUsers();
 
         return users;
     },
@@ -18,7 +18,10 @@ module.exports = {
             return { error: 10, message: 'userId is required' };
         }
 
-        var user = await userRepo.getUserById(userId);
+        const user = await userRepo.getUserById(userId);
+        if (Object.keys(user).length == 0) {
+            return { error: 12, message: 'no user found' };
+        }
 
         return user;
     },
@@ -29,20 +32,20 @@ module.exports = {
         }
 
         // Step 1: Check user not existed in database
-        var dbUser = await userRepo.getUserByUsername(user.username);
+        const dbUser = await userRepo.getUserByUsername(user.username);
         if (dbUser) {
             return { error: 20, message: 'user is already created' };
         }
 
         // Step 2: Hash user password
-        var salt = getRandomString(20);
-        var pw = user.password + salt;
-        var hashedPw = await bcrypt.hash(pw, 10);
+        const salt = getRandomString(20);
+        const pw = user.password + salt;
+        const hashedPw = await bcrypt.hash(pw, 10);
 
         // Step 3: Insert user into database
-        var statusId = 1; // NOT_VERIFIED
-        var roleId = 2; // Normal User
-        var dbUserId = await userRepo.createUser({
+        const statusId = 1; // NOT_VERIFIED
+        const roleId = 2; // Normal User
+        const dbUserId = await userRepo.createUser({
             username: user.username,
             displayName: user.display_name,
             password: hashedPw,
@@ -52,7 +55,7 @@ module.exports = {
         });
 
         // Step 4: Generate verify account token
-        var token = await tokenServ.generateVerifyAccountToken(dbUserId);
+        const token = await tokenServ.generateVerifyAccountToken(dbUserId);
 
         // TODO: Step 5: Send confirmation email with verify token
 
@@ -63,7 +66,7 @@ module.exports = {
             return { error: 10, message: 'id is required' };
         }
 
-        var resp = await userRepo.updateUserById({
+        const resp = await userRepo.updateUserById({
             id: id,
             displayName: user.display_name,
         });
@@ -75,7 +78,7 @@ module.exports = {
             return { error: 10, message: 'id is required' };
         }
 
-        var resp = await userRepo.updateUserById({
+        const resp = await userRepo.updateUserById({
             id: id,
             deleted: 1,
         });
@@ -89,13 +92,13 @@ module.exports = {
         }
 
         // Step 1: Check if username and password are correct
-        var dbUser = await userRepo.getUserByUsername(user.username);
+        const dbUser = await userRepo.getUserByUsername(user.username);
         if (!dbUser) {
             return { error: 21, message: 'username or password incorrect' };
         }
 
-        var pw = user.password + dbUser.salt;
-        var pwCorrect = await bcrypt.compare(pw, dbUser.password)
+        const pw = user.password + dbUser.salt;
+        const pwCorrect = await bcrypt.compare(pw, dbUser.password)
         if (!pwCorrect) {
             return { error: 21, message: 'username or password incorrect' };
         }
@@ -111,21 +114,21 @@ module.exports = {
         }
 
         // Step 3: Generate user session token
-        var token = await tokenServ.generateUserSessionToken(dbUser.id);
+        const token = await tokenServ.generateUserSessionToken(dbUser.id);
 
         // Step 4: Return token to user
         return token;
     },
     verifyUser: async (token) => {
         // Step 1: Verify token
-        var t = await tokenServ.verifyVerifyAccountToken(token);
+        const t = await tokenServ.verifyVerifyAccountToken(token);
         if (!t) {
             return { error: 11, message: 'invalid token' };
         }
 
         // Step 2: Update user status to active
-        var userId = t.user_id;
-        var user = await userRepo.updateUserById({
+        const userId = t.user_id;
+        const user = await userRepo.updateUserById({
             id: userId,
             statusId: 0 // ACTIVE
         });
@@ -141,13 +144,13 @@ module.exports = {
             return { error: 10, message: 'userId is required' };
         }
 
-        var user = await userRepo.getUserById(userId);
+        const user = await userRepo.getUserById(userId);
         if (!user) {
             return { error: 99, message: 'Unknow Error: cannnot get user by id' };
         }
 
-        var roleId = user.role_id;
-        var userActions = await userActionRepo.getUserActionsByRoleId(roleId);
+        const roleId = user.role_id;
+        const userActions = await userActionRepo.getUserActionsByRoleId(roleId);
 
         return userActions;
     },

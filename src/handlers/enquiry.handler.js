@@ -10,7 +10,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await enquiryServ.getAllEnquiries();
+            const data = await enquiryServ.getAllEnquiries();
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -27,7 +27,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await enquiryServ.getEnquiryById(req.params.id);
+            const data = await enquiryServ.getEnquiryById(req.params.id);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -39,7 +39,7 @@ module.exports = {
     },
     createEnquiry: async (req, res) => {
         try {
-            var data = await enquiryServ.createEnquiry(req.body);
+            const data = await enquiryServ.createEnquiry(req.body);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
@@ -56,11 +56,11 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await enquiryServ.updateEnquiryById(req.params.id, req.body);
+            const data = await enquiryServ.updateEnquiryById(req.params.id, req.body);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
-            return res.status(200).json(dataToResp(0, "Success", data));
+            return res.status(200).json(dataToResp(0, "Success", {}));
         } catch (err) {
             console.error(err.message);
             return res.status(500).json();
@@ -73,7 +73,7 @@ module.exports = {
                 return res.status(401).json();
             }
 
-            var data = await enquiryServ.deleteEnquiryById(req.params.id);
+            const data = await enquiryServ.deleteEnquiryById(req.params.id);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }
