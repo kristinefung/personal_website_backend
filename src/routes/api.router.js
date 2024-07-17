@@ -14,7 +14,7 @@ router.put('/users/:id', userHdlr.updateUserById);
 router.delete('/users/:id', userHdlr.deleteUserById);
 
 router.post('/login', userHdlr.login);
-router.get('/verify-user', userHdlr.verifyUser);
+router.get('/verify-account', userHdlr.verifyAccount);
 
 /***************************************************
  *                Enquiry Module

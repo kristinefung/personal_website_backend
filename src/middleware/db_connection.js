@@ -28,9 +28,12 @@ const connectMysql = async (query, values = null) => {
 
     try {
         // Getting a connection from the pool
+        connection.beginTransaction();
         [results,] = await connection.execute(query, values);
+        connection.commit();
     } catch (error) {
         console.error('Error executing query:', error);
+        connection.rollback();
         throw error;
     } finally {
 

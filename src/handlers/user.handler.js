@@ -99,14 +99,14 @@ module.exports = {
             return res.status(500).json();
         }
     },
-    verifyUser: async (req, res) => {
+    verifyAccount: async (req, res) => {
         try {
             const { t } = req.query;
             if (!t) {
                 return res.status(404).json();
             }
 
-            const data = await userServ.verifyUser(t);
+            const data = await userServ.verifyAccount(t);
             if (data.error) {
                 return res.status(200).json(dataToResp(data.error, data.message, {}));
             }

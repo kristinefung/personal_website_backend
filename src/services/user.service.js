@@ -119,7 +119,7 @@ module.exports = {
         // Step 4: Return token to user
         return token;
     },
-    verifyUser: async (token) => {
+    verifyAccount: async (token) => {
         // Step 1: Verify token
         const t = await tokenServ.verifyVerifyAccountToken(token);
         if (!t) {
