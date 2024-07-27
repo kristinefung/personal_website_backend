@@ -33,7 +33,7 @@ module.exports = {
 
         // Step 1: Check user not existed in database
         const dbUser = await userRepo.getUserByUsername(user.username);
-        if (dbUser) {
+        if (Object.keys(dbUser).length !== 0) {
             return { error: 20, message: 'user is already created' };
         }
 
@@ -59,7 +59,7 @@ module.exports = {
 
         // TODO: Step 5: Send confirmation email with verify token
 
-        return user;
+        return {};
     },
     updateUserById: async (id, user) => {
         if (!id) {
@@ -93,7 +93,7 @@ module.exports = {
 
         // Step 1: Check if username and password are correct
         const dbUser = await userRepo.getUserByUsername(user.username);
-        if (!dbUser) {
+        if (Object.keys(dbUser).length === 0) {
             return { error: 21, message: 'username or password incorrect' };
         }
 
