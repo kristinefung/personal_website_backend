@@ -4,6 +4,8 @@ const userRepo = require('../adapters/repositories/user.repository');
 const userActionRepo = require('../adapters/repositories/user_action.repository');
 const tokenServ = require('./token.service');
 
+const mailGun = require('../adapters/apis/mail_gun');
+
 const { getRandomString } = require('../utils/common');
 
 module.exports = {
@@ -58,6 +60,7 @@ module.exports = {
         const token = await tokenServ.generateVerifyAccountToken(dbUserId);
 
         // TODO: Step 5: Send confirmation email with verify token
+        mailGun.sendConfirmationEmail(user.username, token);
 
         return {};
     },
