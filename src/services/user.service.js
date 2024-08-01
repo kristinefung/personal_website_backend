@@ -1,159 +1,227 @@
 const bcrypt = require('bcrypt');
 
+const mailGun = require('../adapters/apis/mail_gun');
 const userRepo = require('../adapters/repositories/user.repository');
 const userActionRepo = require('../adapters/repositories/user_action.repository');
 const tokenServ = require('./token.service');
 
-const mailGun = require('../adapters/apis/mail_gun');
-
+const { USER_STATUS, ROLE } = require('../utils/mapper');
+const { logger } = require('../utils/logger');
 const { getRandomString } = require('../utils/common');
+
+const { Err } = require('../utils/err');
+const { CODE } = require('../utils/mapper');
 
 module.exports = {
     getAllUsers: async () => {
-        const users = await userRepo.getAllUsers();
+        const users = await userRepo.getAllUsers()
+            .catch(err => {
+                throw new Err('cannot get all users from database', CODE.DATABASE_ERROR);
+            });
 
         return users;
     },
     getUserById: async (userId) => {
         // Step 0: Data validation
         if (!userId) {
-            return { error: 10, message: 'userId is required' };
+            throw new Err('userId is required', CODE.INVALID_PARAM);
         }
 
-        const user = await userRepo.getUserById(userId);
-        if (Object.keys(user).length == 0) {
-            return { error: 12, message: 'no user found' };
+        const user = await userRepo.getUserById(userId)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot get user by id from database', CODE.DATABASE_ERROR);
+            });
+        if (!user.id) {
+            throw new Err('no user found', CODE.USER_NOT_EXISTED);
         }
 
         return user;
     },
     createUser: async (user) => {
         // Step 0: Data validation
-        if (!user.username || !user.display_name || !user.password) {
-            return { error: 10, message: 'username, display_name and password are required' };
+        if (!user.email || !user.display_name || !user.password) {
+            throw new Err('email, display_name and password are required', CODE.INVALID_PARAM);
         }
 
         // Step 1: Check user not existed in database
-        const dbUser = await userRepo.getUserByUsername(user.username);
-        if (Object.keys(dbUser).length !== 0) {
-            return { error: 20, message: 'user is already created' };
+        const dbUser = await userRepo.getUserByEmail(user.email)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot get user from database', CODE.DATABASE_ERROR);
+            });
+        if (dbUser.id) {
+            throw new Err('user is already created', CODE.USER_EXISTED);
         }
 
         // Step 2: Hash user password
         const salt = getRandomString(20);
         const pw = user.password + salt;
-        const hashedPw = await bcrypt.hash(pw, 10);
+        const hashedPw = await bcrypt.hash(pw, 10)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot hash password', CODE.UNKNOWN_ERROR);
+            });
 
         // Step 3: Insert user into database
-        const statusId = 1; // NOT_VERIFIED
-        const roleId = 2; // Normal User
         const dbUserId = await userRepo.createUser({
-            username: user.username,
+            email: user.email,
             displayName: user.display_name,
             password: hashedPw,
             salt: salt,
-            roleId: roleId,
-            statusId: statusId
+            roleId: ROLE.USER,
+            statusId: USER_STATUS.NOT_VERIFIED
+        }).catch(err => {
+            logger.error(err.message);
+            throw new Err('cannot create user in database', CODE.DATABASE_ERROR);
         });
 
         // Step 4: Generate verify account token
-        const token = await tokenServ.generateVerifyAccountToken(dbUserId);
+        const token = await tokenServ.generateVerifyAccountToken(dbUserId)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot generate verify account token', CODE.UNKNOWN_ERROR);
+            });
 
-        // TODO: Step 5: Send confirmation email with verify token
-        mailGun.sendConfirmationEmail(user.username, token);
+        // Step 5: Send confirmation email with verify token
+        await mailGun.sendConfirmationEmail(user.email, token)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot send confirmation email', CODE.UNKNOWN_ERROR);
+            });
 
         return {};
     },
     updateUserById: async (id, user) => {
+        // Step 0: Data validation
         if (!id) {
-            return { error: 10, message: 'id is required' };
+            throw new Err('id is required', CODE.INVALID_PARAM);
         }
 
-        const resp = await userRepo.updateUserById({
+        // Step 1: Check user existed in database
+        const dbUser = await userRepo.getUserById(id)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot get user by id from database', CODE.DATABASE_ERROR);
+            });
+        if (!dbUser.id) {
+            throw new Err('no user found', CODE.USER_NOT_EXISTED);
+        }
+
+        // Step 2: Update user by id
+        const changedRows = await userRepo.updateUserById({
             id: id,
             displayName: user.display_name,
+        }).catch(err => {
+            throw new Err('cannot update user by id in database', CODE.DATABASE_ERROR);
         });
 
-        return resp;
+        return changedRows;
     },
     deleteUserById: async (id) => {
+        // Step 0: Data validation
         if (!id) {
-            return { error: 10, message: 'id is required' };
+            throw new Err('id is required', CODE.INVALID_PARAM);
         }
 
-        const resp = await userRepo.updateUserById({
+        // Step 1: Check user existed in database
+        const dbUser = await userRepo.getUserById(id)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot get user by id from database', CODE.DATABASE_ERROR);
+            });
+        if (!dbUser.id) {
+            throw new Err('no user found', CODE.USER_NOT_EXISTED);
+        }
+
+        // Step 2: Delete user by id
+        const user = await userRepo.updateUserById({
             id: id,
             deleted: 1,
+        }).catch(err => {
+            throw new Err('cannot update user by id in database', CODE.DATABASE_ERROR);
         });
 
-        return resp;
+        return user;
     },
     login: async (user) => {
         // Step 0: Data validation
-        if (!user.username || !user.password) {
-            return { error: 10, message: 'username and password are required' };
+        if (!user.email || !user.password) {
+            throw new Err('email and password are required', CODE.INVALID_PARAM);
         }
 
-        // Step 1: Check if username and password are correct
-        const dbUser = await userRepo.getUserByUsername(user.username);
-        if (Object.keys(dbUser).length === 0) {
-            return { error: 21, message: 'username or password incorrect' };
+        // Step 1: Check if email and password are correct
+        const dbUser = await userRepo.getUserByEmail(user.email)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot get user by email in database', CODE.DATABASE_ERROR);
+            });
+        if (!dbUser.id) {
+            throw new Err('email or password incorrect', CODE.INCORRECT_CREDENTIAL);
         }
 
         const pw = user.password + dbUser.salt;
         const pwCorrect = await bcrypt.compare(pw, dbUser.password)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot compare password', CODE.UNKNOWN_ERROR);
+            });
         if (!pwCorrect) {
-            return { error: 21, message: 'username or password incorrect' };
+            throw new Err('email or password incorrect', CODE.INCORRECT_CREDENTIAL);
         }
 
         // Step 2: Check if user status is active
         switch (dbUser.status_id) {
-            case 1:
-                return { error: 22, message: 'please verify your user account' };
-            default:
-                if (dbUser.status_id !== 0) {
-                    return { error: 23, message: 'invalid user' };
-                }
+            case USER_STATUS.NOT_VERIFIED:
+                throw new Err('please verify your user account', CODE.USER_NOT_VERIFIED);
         }
 
         // Step 3: Generate user session token
-        const token = await tokenServ.generateUserSessionToken(dbUser.id);
+        const token = await tokenServ.generateUserSessionToken(dbUser.id)
+            .catch(err => {
+                logger.error(err.message);
+                throw new Err('cannot generate user session token', CODE.UNKNOWN_ERROR);
+            });
 
         // Step 4: Return token to user
         return token;
     },
     verifyAccount: async (token) => {
         // Step 1: Verify token
-        const t = await tokenServ.verifyVerifyAccountToken(token);
+        const t = await tokenServ.verifyAccountToken(token)
+            .catch(err => {
+                throw new Err('cannot verify account token', CODE.UNKNOWN_ERROR);
+            });
         if (!t) {
-            return { error: 11, message: 'invalid token' };
+            throw new Err('invalid token', CODE.INVALID_PARAM);
         }
 
         // Step 2: Update user status to active
         const userId = t.user_id;
         const user = await userRepo.updateUserById({
             id: userId,
-            statusId: 0 // ACTIVE
+            statusId: USER_STATUS.ACTIVE
+        }).catch(err => {
+            throw new Err('cannnot update user by id', CODE.DATABASE_ERROR);
         });
-        if (!user) {
-            return { error: 99, message: 'Unknow Error: cannnot update user by id' };
-        }
 
         return user;
     },
     getUserActionsByUserId: async (userId) => {
         // Step 0: Data validation
         if (!userId) {
-            return { error: 10, message: 'userId is required' };
+            throw new Err('userId is required', CODE.INVALID_PARAM);
         }
 
-        const user = await userRepo.getUserById(userId);
-        if (!user) {
-            return { error: 99, message: 'Unknow Error: cannnot get user by id' };
-        }
+        const user = await userRepo.getUserById(userId)
+            .catch(err => {
+                throw new Err('cannnot get user by id', CODE.DATABASE_ERROR);
+            });
 
-        const roleId = user.role_id;
-        const userActions = await userActionRepo.getUserActionsByRoleId(roleId);
+        const userActions = await userActionRepo.getUserActionsByRoleId(user.role_id)
+            .catch(err => {
+                throw new Err('cannnot get user actions by role id', CODE.DATABASE_ERROR);
+            });
 
         return userActions;
     },

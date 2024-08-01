@@ -10,17 +10,11 @@ module.exports = {
             if (!auth) {
                 return res.status(401).json();
             }
-
-            const data = await userServ.getAllUsers();
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-
-            res.status(200).json(dataToResp(0, "Success", data));
+            const user = await userServ.getAllUsers();
+            return res.status(200).json(dataToResp(0, "Success to get all users", user));
 
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
     getUserById: async (req, res) => {
@@ -29,44 +23,34 @@ module.exports = {
             if (!auth) {
                 return res.status(401).json();
             }
+            const user = await userServ.getUserById(req.params.id);
+            return res.status(200).json(dataToResp(0, "Success to update user", user));
 
-            const data = await userServ.getUserById(req.params.id);
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-            return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
     createUser: async (req, res) => {
         try {
-            const data = await userServ.createUser(req.body);
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-            return res.status(200).json(dataToResp(0, "Success", data));
+            const user = await userServ.createUser(req.body);
+            return res.status(200).json(dataToResp(0, "Success to create user", {}));
+
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
-    updateUserById: async (req, res) => {
+    updateUserById: async (req, res, next) => {
         try {
-            const auth = await userAuth(req.headers.authorization, 'updateUserById');
+            const auth = await userAuth(req.headers.authorization, 'updateUserById')
             if (!auth) {
                 return res.status(401).json();
             }
 
-            const data = await userServ.updateUserById(req.params.id, req.body);
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-            return res.status(200).json(dataToResp(0, "Success", {}));
+            const user = await userServ.updateUserById(req.params.id, req.body);
+            return res.status(200).json(dataToResp(0, "Success to update user", {}));
+
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
     deleteUserById: async (req, res) => {
@@ -75,28 +59,21 @@ module.exports = {
             if (!auth) {
                 return res.status(401).json();
             }
+            const user = await userServ.deleteUserById(req.params.id);
+            return res.status(200).json(dataToResp(0, "Success to delete user", {}));
 
-            const data = await userServ.deleteUserById(req.params.id);
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-            return res.status(200).json(dataToResp(0, "Success", data));
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
     login: async (req, res) => {
         try {
             const token = await userServ.login(req.body);
-            if (token.error) {
-                return res.status(200).json(dataToResp(token.error, token.message, {}));
-            }
-            const data = { "user_session_token": token }
-            return res.status(200).json(dataToResp(0, "Success", data));
+            const data = { "user_session_token": token };
+            return res.status(200).json(dataToResp(0, "Success to login", data));
+
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}));
         }
     },
     verifyAccount: async (req, res) => {
@@ -106,14 +83,11 @@ module.exports = {
                 return res.status(404).json();
             }
 
-            const data = await userServ.verifyAccount(t);
-            if (data.error) {
-                return res.status(200).json(dataToResp(data.error, data.message, {}));
-            }
-            return res.status(200).json(dataToResp(0, "Success", {}));
+            const user = await userServ.verifyAccount(t);
+            return res.status(200).json(dataToResp(0, "Success to verify account", {}));
+
         } catch (err) {
-            console.error(err.message);
-            return res.status(500).json();
+            return res.status(200).json(dataToResp(err.status, err.message, {}))
         }
     }
 }

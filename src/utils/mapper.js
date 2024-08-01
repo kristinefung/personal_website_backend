@@ -1,20 +1,26 @@
 module.exports = {
-    apiStatusMapper: (status) => {
-        const statusCodes = new Map([
-            ["0", "SUCCESS"],
-            // Unexpected error
-            ["99", "UNKOWN_ERROR"],
-            // Common error
-            ["10", "INVALID_PARAM"],
-            ["11", "INVALID_TOKEN"],
-            ["12", "RECORD_NOT_EXISTED"],
-            // User related
-            ["20", "USER_EXISTED"],
-            ["21", "INCORRECT_CREDENTIAL"],
-            ["22", "USER_NOT_VERIFIED"],
-            ["23", "INVALID_USER"],
-        ]);
-
-        return statusCodes.get(status + "");
+    CODE: {
+        SUCCESS: 0,
+        // Unexpected error
+        UNKNOWN_ERROR: 99,
+        // Common error
+        DATABASE_ERROR: 10,
+        INVALID_PARAM: 11,
+        INVALID_TOKEN: 12,
+        // User related
+        USER_EXISTED: 20,
+        USER_NOT_EXISTED: 21,
+        INCORRECT_CREDENTIAL: 22,
+        USER_NOT_VERIFIED: 23,
+        INVALID_USER: 24,
+    },
+    ROLE: {
+        ADMIN: 1,
+        USER: 2,
+    },
+    USER_STATUS: {
+        ACTIVE: 1,
+        NOT_VERIFIED: 2,
+        INACTIVE: 3
     }
 }

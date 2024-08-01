@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const verifyAccountTokenRepo = require('../adapters/repositories/verify_account_token.repository');
+const accountTokenRepo = require('../adapters/repositories/account_token.repository');
 const userSessionTokenRepo = require('../adapters/repositories/user_session_token.repository');
 const { getRandomString } = require('../utils/common');
 
@@ -33,9 +33,9 @@ module.exports = {
 
         return token;
     },
-    verifyVerifyAccountToken: async (token) => {
+    verifyAccountToken: async (token) => {
         // Step 1: Check if token existed 
-        const t = await verifyAccountTokenRepo.getVerifyAccountTokenByToken(token);
+        const t = await accountTokenRepo.getAccountTokenByToken(token);
         if (!t) {
             return;
         }
@@ -48,7 +48,7 @@ module.exports = {
         }
 
         // Step 3: Update token to deleted
-        const updatedToken = await verifyAccountTokenRepo.updateVerifyAccountTokenByToken(token, 1);
+        const updatedToken = await accountTokenRepo.updateAccountTokenByToken(token, 1);
 
         return t;
     },

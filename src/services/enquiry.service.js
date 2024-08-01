@@ -10,7 +10,7 @@ module.exports = {
     getEnquiryById: async (enquiryId) => {
         // Step 0: Data validation
         if (!enquiryId) {
-            return { error: 10, message: 'username, enquiryId is required' };
+            return { error: 10, message: 'email, enquiryId is required' };
         }
 
         const enquiry = await enquiryRepo.getEnquiryById(enquiryId);

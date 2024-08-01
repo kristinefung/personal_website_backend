@@ -1,6 +1,9 @@
 ./node_modules
 node_modules
 
+./logs
+logs
+
 .env
 package-lock.json
 private_key.pem

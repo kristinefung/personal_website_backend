@@ -1,6 +1,9 @@
 const tokenServ = require('../services/token.service');
 const userServ = require('../services/user.service');
 
+const { Err } = require('../utils/err');
+const { CODE } = require('../utils/mapper');
+
 module.exports = {
     userAuth: async (authHeader, action) => {
         if (!authHeader) {
@@ -14,13 +17,19 @@ module.exports = {
             return false;
         }
 
-        const payload = await tokenServ.verifyUserSessionToken(token);
+        const payload = await tokenServ.verifyUserSessionToken(token)
+            .catch(err => {
+                throw new Err('cannot verify user session token', CODE.UNKNOWN_ERROR);
+            });
         if (!payload) {
             console.log("!payload");
             return false;
         }
 
         const userActions = await userServ.getUserActionsByUserId(payload.userId)
+            .catch(err => {
+                throw new Err('cannot get user actions by user id', CODE.UNKNOWN_ERROR);
+            });
         if (userActions.error) {
             console.log("userActions.error");
             return false;
