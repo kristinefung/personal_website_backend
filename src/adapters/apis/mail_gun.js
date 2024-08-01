@@ -28,5 +28,22 @@ module.exports = {
                 console.log('Email sent: ' + info.response);
             }
         });
+    },
+    sendReceivicationEmailToAdmin: async () => {
+        // Define the email options
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: process.env.ADMIN_EMAIL,
+            subject: 'You received an enquiry',
+            text: `You received an enquiry`
+        };
+        // Send the email
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
     }
 }
