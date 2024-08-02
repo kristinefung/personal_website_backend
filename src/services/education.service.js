@@ -29,40 +29,91 @@ module.exports = {
 
         return education;
     },
-    createEducation: async (education) => {
+    createEducation: async (edu) => {
         // Step 0: Data validation
-        if (!education.degree || !education.subject || !education.school_name || !education.start_date_month || !education.start_date_year || !education.is_current === '') {
-            throw new Err('degree, subject, school_name, start_date_month, start_date_year and is_current are required', CODE.INVALID_PARAM);
+        const currentYear = new Date().getFullYear();
+
+        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_date_month || !edu.start_date_year) {
+            throw new Err('degree, subject, school_name, start_date_month and start_date_year are required', CODE.INVALID_PARAM);
         }
-        if (education.is_current === 0) {
-            if (!education.end_date_month || !education.end_date_year) {
+        if (edu.is_current !== 0 && edu.is_current !== 1) {
+            throw new Err('is_current must be 0 or 1', CODE.INVALID_PARAM);
+        }
+        if (!Number.isInteger(edu.start_date_month) || edu.start_date_month < 1 || edu.start_date_month > 12) {
+            throw new Err('start_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+        }
+        if (!Number.isInteger(edu.start_date_year) || edu.start_date_year < 1900 || edu.start_date_year > currentYear) {
+            throw new Err(`start_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+        }
+        if (edu.is_current === 0) {
+            if (!edu.end_date_month || !edu.end_date_year) {
                 throw new Err('end_date_month and end_date_year are required if is_current is false', CODE.INVALID_PARAM);
+            }
+            if (!Number.isInteger(edu.end_date_month) || edu.end_date_month < 1 || edu.end_date_month > 12) {
+                throw new Err('end_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+            }
+            if (!Number.isInteger(edu.end_date_year) || edu.end_date_year < 1900 || edu.end_date_year > currentYear) {
+                throw new Err(`end_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+            }
+            const startDate = new Date(edu.start_date_year, edu.start_date_month - 1, 1);
+            const endDate = new Date(edu.end_date_year, edu.end_date_month - 1, 1);
+            if (startDate > endDate) {
+                throw new Err('start_date must before end_date', CODE.INVALID_PARAM);
             }
         }
 
         // Step 1: Insert education into database
         const dbEducationId = await educationRepo.create({
-            degree: education.degree,
-            subject: education.subject,
-            schoolName: education.school_name,
-            description: education.description ?? '',
-            startDateMonth: education.start_date_month,
-            startDateYear: education.start_date_year,
-            endDateMonth: education.end_date_month,
-            endDateYear: education.end_date_year,
-            isCurrent: education.is_current
+            degree: edu.degree,
+            subject: edu.subject,
+            schoolName: edu.school_name,
+            description: edu.description ?? '',
+            startDateMonth: edu.start_date_month,
+            startDateYear: edu.start_date_year,
+            endDateMonth: edu.is_current === 0 ? edu.end_date_month : null,
+            endDateYear: edu.is_current === 0 ? edu.end_date_year : null,
+            isCurrent: edu.is_current
         })
             .catch(err => {
                 logger.error(err.message);
                 throw new Err('cannot create education from database', CODE.DATABASE_ERROR);
             });
 
-        return education;
+        return edu;
     },
-    updateEducationById: async (id, education) => {
+    updateEducationById: async (id, edu) => {
         // Step 0: Data validation
+        const currentYear = new Date().getFullYear();
         if (!id) {
             throw new Err('id is required', CODE.INVALID_PARAM);
+        }
+        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_date_month || !edu.start_date_year) {
+            throw new Err('degree, subject, school_name, start_date_month and start_date_year are required', CODE.INVALID_PARAM);
+        }
+        if (edu.is_current !== 0 && edu.is_current !== 1) {
+            throw new Err('is_current must be 0 or 1', CODE.INVALID_PARAM);
+        }
+        if (!Number.isInteger(edu.start_date_month) || edu.start_date_month < 1 || edu.start_date_month > 12) {
+            throw new Err('start_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+        }
+        if (!Number.isInteger(edu.start_date_year) || edu.start_date_year < 1900 || edu.start_date_year > currentYear) {
+            throw new Err(`start_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+        }
+        if (edu.is_current === 0) {
+            if (!edu.end_date_month || !edu.end_date_year) {
+                throw new Err('end_date_month and end_date_year are required if is_current is false', CODE.INVALID_PARAM);
+            }
+            if (!Number.isInteger(edu.end_date_month) || edu.end_date_month < 1 || edu.end_date_month > 12) {
+                throw new Err('end_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+            }
+            if (!Number.isInteger(edu.end_date_year) || edu.end_date_year < 1900 || edu.end_date_year > currentYear) {
+                throw new Err(`end_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+            }
+            const startDate = new Date(edu.start_date_year, edu.start_date_month - 1, 1);
+            const endDate = new Date(edu.end_date_year, edu.end_date_month - 1, 1);
+            if (startDate > endDate) {
+                throw new Err('start_date must before end_date', CODE.INVALID_PARAM);
+            }
         }
 
         // Step 1: Check education existed in database
@@ -78,15 +129,15 @@ module.exports = {
         // Step 2: Update education
         const changedRows = await educationRepo.updateById({
             id: id,
-            degree: education.degree,
-            subject: education.subject,
-            schoolName: education.school_name,
-            description: education.description,
-            startDateMonth: education.start_date_month,
-            startDateYear: education.start_date_year,
-            endDateMonth: education.end_date_month,
-            endDateYear: education.end_date_year,
-            isCurrent: education.is_current
+            degree: edu.degree,
+            subject: edu.subject,
+            schoolName: edu.school_name,
+            description: edu.description ?? '',
+            startDateMonth: edu.start_date_month,
+            startDateYear: edu.start_date_year,
+            endDateMonth: edu.is_current === 0 ? edu.end_date_month : null,
+            endDateYear: edu.is_current === 0 ? edu.end_date_year : null,
+            isCurrent: edu.is_current
         })
             .catch(err => {
                 logger.error(err.message);
