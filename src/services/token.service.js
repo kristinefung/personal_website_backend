@@ -7,7 +7,7 @@ const { getRandomString } = require('../utils/common');
 const secretKey = process.env.JWT_SECRET_KEY;
 
 module.exports = {
-    generateVerifyAccountToken: async (userId) => {
+    generateAccountToken: async (userId) => {
         // Step 1: Generate token
         const length = Math.floor(Math.random() * 11) + 50; // token length random from 50 - 60
         const token = getRandomString(length);
@@ -17,7 +17,7 @@ module.exports = {
         expiredAt.setHours(expiredAt.getHours() + 2);
 
         // Step 3: Insert token record into database
-        const tokenId = await verifyAccountTokenRepo.createVerifyAccountToken(userId, token, expiredAt);
+        const tokenId = await accountTokenRepo.createAccountToken(userId, token, expiredAt);
 
         return token;
     },

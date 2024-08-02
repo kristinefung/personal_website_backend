@@ -76,14 +76,14 @@ module.exports = {
             throw new Err('cannot create user in database', CODE.DATABASE_ERROR);
         });
 
-        // Step 4: Generate verify account token
-        const token = await tokenServ.generateVerifyAccountToken(dbUserId)
+        // Step 4: Generate account token
+        const token = await tokenServ.generateAccountToken(dbUserId)
             .catch(err => {
                 logger.error(err.message);
                 throw new Err('cannot generate verify account token', CODE.UNKNOWN_ERROR);
             });
 
-        // Step 5: Send confirmation email with verify token
+        // Step 5: Send confirmation email with account token
         await mailGun.sendConfirmationEmail(user.email, token)
             .catch(err => {
                 logger.error(err.message);
