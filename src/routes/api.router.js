@@ -1,14 +1,15 @@
 const express = require('express');
-const healthHdlr = require('../handlers/health.handler')
+const apiInfoHdlr = require('../handlers/api_info.handler')
 const userHdlr = require('../handlers/user.handler')
 const enquiryHdlr = require('../handlers/enquiry.handler')
+const workHdlr = require('../handlers/work.handler')
 
 const router = express.Router();
 
 /*************************************************************
  *                         API Info
  ************************************************************/
-router.get('/health', healthHdlr.health);
+router.get('/', apiInfoHdlr.apiInfo);
 
 /*************************************************************
  *                        User Module
@@ -32,7 +33,12 @@ router.put('/enquiries/:id', enquiryHdlr.updateEnquiryById);
 router.delete('/enquiries/:id', enquiryHdlr.deleteEnquiryById);
 
 /*************************************************************
- *                        Work Module
+ *                         Work Module
  ************************************************************/
+router.post('/works', workHdlr.createWork);
+router.get('/works', workHdlr.getAllWorks);
+router.get('/works/:id', workHdlr.getWorkById);
+router.put('/works/:id', workHdlr.updateWorkById);
+router.delete('/works/:id', workHdlr.deleteWorkById);
 
 module.exports = router;

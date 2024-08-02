@@ -22,7 +22,7 @@ module.exports = {
         const enquiry = await enquiryRepo.getEnquiryById(enquiryId)
             .catch(err => {
                 logger.error(err.message);
-                throw new Err('cannot get user by id from database', CODE.DATABASE_ERROR);
+                throw new Err('cannot get enquiry by id from database', CODE.DATABASE_ERROR);
             });
         if (!enquiry.id) {
             throw new Err('no enquiry found', CODE.INVALID_PARAM);
