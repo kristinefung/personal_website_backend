@@ -1,4 +1,3 @@
-const mailGun = require('../adapters/apis/mail_gun');
 const workRepo = require('../adapters/repositories/work.repository');
 
 const { Err } = require('../utils/err');

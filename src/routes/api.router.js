@@ -3,6 +3,7 @@ const apiInfoHdlr = require('../handlers/api_info.handler')
 const userHdlr = require('../handlers/user.handler')
 const enquiryHdlr = require('../handlers/enquiry.handler')
 const workHdlr = require('../handlers/work.handler')
+const educationHdlr = require('../handlers/education.handler')
 
 const router = express.Router();
 
@@ -40,5 +41,14 @@ router.get('/works', workHdlr.getAllWorks);
 router.get('/works/:id', workHdlr.getWorkById);
 router.put('/works/:id', workHdlr.updateWorkById);
 router.delete('/works/:id', workHdlr.deleteWorkById);
+
+/*************************************************************
+ *                      Education Module
+ ************************************************************/
+router.post('/educations', educationHdlr.createEducation);
+router.get('/educations', educationHdlr.getAllEducations);
+router.get('/educations/:id', educationHdlr.getEducationById);
+router.put('/educations/:id', educationHdlr.updateEducationById);
+router.delete('/educations/:id', educationHdlr.deleteEducationById);
 
 module.exports = router;
