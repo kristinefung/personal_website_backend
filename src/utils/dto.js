@@ -1,7 +1,7 @@
 const { CODE } = require('./mapper');
 
 module.exports = {
-    dataToResp: (status, message, data) => {
+    dataToResp: (status = 99, message, data) => {
         let statusCode = "";
         for (var i in CODE) {
             if (CODE[i] == status) {

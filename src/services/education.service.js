@@ -1,5 +1,6 @@
 const educationRepo = require('../adapters/repositories/education.repository');
 
+const { isValidDate } = require('../utils/common');
 const { Err } = require('../utils/err');
 const { CODE } = require('../utils/mapper');
 
@@ -31,34 +32,24 @@ module.exports = {
     },
     createEducation: async (edu) => {
         // Step 0: Data validation
-        const currentYear = new Date().getFullYear();
-
-        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_date_month || !edu.start_date_year) {
-            throw new Err('degree, subject, school_name, start_date_month and start_date_year are required', CODE.INVALID_PARAM);
+        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_year_month) {
+            throw new Err('degree, subject, school_name and start_year_month are required', CODE.INVALID_PARAM);
         }
         if (edu.is_current !== 0 && edu.is_current !== 1) {
             throw new Err('is_current must be 0 or 1', CODE.INVALID_PARAM);
         }
-        if (!Number.isInteger(edu.start_date_month) || edu.start_date_month < 1 || edu.start_date_month > 12) {
-            throw new Err('start_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
-        }
-        if (!Number.isInteger(edu.start_date_year) || edu.start_date_year < 1900 || edu.start_date_year > currentYear) {
-            throw new Err(`start_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+        if (!isValidDate(edu.start_year_month)) {
+            throw new Err('start_year_month format invalid: must be YYYY/MM', CODE.INVALID_PARAM);
         }
         if (edu.is_current === 0) {
-            if (!edu.end_date_month || !edu.end_date_year) {
-                throw new Err('end_date_month and end_date_year are required if is_current is false', CODE.INVALID_PARAM);
+            if (!edu.end_year_month) {
+                throw new Err('end_year_month are required if is_current is false', CODE.INVALID_PARAM);
             }
-            if (!Number.isInteger(edu.end_date_month) || edu.end_date_month < 1 || edu.end_date_month > 12) {
-                throw new Err('end_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+            if (!isValidDate(edu.end_year_month)) {
+                throw new Err('end_year_month format invalid: must be YYYY/MM', CODE.INVALID_PARAM);
             }
-            if (!Number.isInteger(edu.end_date_year) || edu.end_date_year < 1900 || edu.end_date_year > currentYear) {
-                throw new Err(`end_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
-            }
-            const startDate = new Date(edu.start_date_year, edu.start_date_month - 1, 1);
-            const endDate = new Date(edu.end_date_year, edu.end_date_month - 1, 1);
-            if (startDate > endDate) {
-                throw new Err('start_date must before end_date', CODE.INVALID_PARAM);
+            if (new Date(edu.start_year_month) > new Date(edu.end_year_month)) {
+                throw new Err('start_year_month must before end_year_month', CODE.INVALID_PARAM);
             }
         }
 
@@ -68,10 +59,8 @@ module.exports = {
             subject: edu.subject,
             schoolName: edu.school_name,
             description: edu.description ?? '',
-            startDateMonth: edu.start_date_month,
-            startDateYear: edu.start_date_year,
-            endDateMonth: edu.is_current === 0 ? edu.end_date_month : null,
-            endDateYear: edu.is_current === 0 ? edu.end_date_year : null,
+            startYearMonth: edu.start_year_month,
+            endYearMonth: edu.is_current === 0 ? edu.end_year_month : null,
             isCurrent: edu.is_current
         })
             .catch(err => {
@@ -83,36 +72,27 @@ module.exports = {
     },
     updateEducationById: async (id, edu) => {
         // Step 0: Data validation
-        const currentYear = new Date().getFullYear();
         if (!id) {
             throw new Err('id is required', CODE.INVALID_PARAM);
         }
-        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_date_month || !edu.start_date_year) {
-            throw new Err('degree, subject, school_name, start_date_month and start_date_year are required', CODE.INVALID_PARAM);
+        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_year_month) {
+            throw new Err('degree, subject, school_name and start_year_month are required', CODE.INVALID_PARAM);
         }
         if (edu.is_current !== 0 && edu.is_current !== 1) {
             throw new Err('is_current must be 0 or 1', CODE.INVALID_PARAM);
         }
-        if (!Number.isInteger(edu.start_date_month) || edu.start_date_month < 1 || edu.start_date_month > 12) {
-            throw new Err('start_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
-        }
-        if (!Number.isInteger(edu.start_date_year) || edu.start_date_year < 1900 || edu.start_date_year > currentYear) {
-            throw new Err(`start_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
+        if (!isValidDate(edu.start_year_month)) {
+            throw new Err('start_year_month format invalid: must be YYYY/MM', CODE.INVALID_PARAM);
         }
         if (edu.is_current === 0) {
-            if (!edu.end_date_month || !edu.end_date_year) {
-                throw new Err('end_date_month and end_date_year are required if is_current is false', CODE.INVALID_PARAM);
+            if (!edu.end_year_month) {
+                throw new Err('end_year_month are required if is_current is false', CODE.INVALID_PARAM);
             }
-            if (!Number.isInteger(edu.end_date_month) || edu.end_date_month < 1 || edu.end_date_month > 12) {
-                throw new Err('end_date_month must between 1 - 12 (inclusive)', CODE.INVALID_PARAM);
+            if (!isValidDate(edu.end_year_month)) {
+                throw new Err('end_year_month format invalid: must be YYYY/MM', CODE.INVALID_PARAM);
             }
-            if (!Number.isInteger(edu.end_date_year) || edu.end_date_year < 1900 || edu.end_date_year > currentYear) {
-                throw new Err(`end_date_year must between 1900 - ${currentYear} (inclusive)`, CODE.INVALID_PARAM);
-            }
-            const startDate = new Date(edu.start_date_year, edu.start_date_month - 1, 1);
-            const endDate = new Date(edu.end_date_year, edu.end_date_month - 1, 1);
-            if (startDate > endDate) {
-                throw new Err('start_date must before end_date', CODE.INVALID_PARAM);
+            if (new Date(edu.start_year_month) > new Date(edu.end_year_month)) {
+                throw new Err('start_year_month must before end_year_month', CODE.INVALID_PARAM);
             }
         }
 
@@ -133,10 +113,8 @@ module.exports = {
             subject: edu.subject,
             schoolName: edu.school_name,
             description: edu.description ?? '',
-            startDateMonth: edu.start_date_month,
-            startDateYear: edu.start_date_year,
-            endDateMonth: edu.is_current === 0 ? edu.end_date_month : null,
-            endDateYear: edu.is_current === 0 ? edu.end_date_year : null,
+            startYearMonth: edu.start_year_month,
+            endYearMonth: edu.is_current === 0 ? edu.end_year_month : null,
             isCurrent: edu.is_current
         })
             .catch(err => {
