@@ -59,7 +59,7 @@ module.exports = {
             companyName: work.company_name,
             description: work.description ?? '',
             startYearMonth: work.start_year_month,
-            endYearMonth: work.is_current === 0 ? work.end_year_month : null,
+            endYearMonth: work.is_current === 0 ? work.end_year_month : '',
             isCurrent: work.is_current
         })
             .catch(err => {
@@ -112,7 +112,7 @@ module.exports = {
             companyName: work.company_name,
             description: work.description ?? '',
             startYearMonth: work.start_year_month,
-            endYearMonth: work.is_current === 0 ? work.end_year_month : null,
+            endYearMonth: work.is_current === 0 ? work.end_year_month : '',
             isCurrent: work.is_current
         })
             .catch(err => {

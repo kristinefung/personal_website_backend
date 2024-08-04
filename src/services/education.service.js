@@ -60,7 +60,7 @@ module.exports = {
             schoolName: edu.school_name,
             description: edu.description ?? '',
             startYearMonth: edu.start_year_month,
-            endYearMonth: edu.is_current === 0 ? edu.end_year_month : null,
+            endYearMonth: edu.is_current === 0 ? edu.end_year_month : '',
             isCurrent: edu.is_current
         })
             .catch(err => {
@@ -114,7 +114,7 @@ module.exports = {
             schoolName: edu.school_name,
             description: edu.description ?? '',
             startYearMonth: edu.start_year_month,
-            endYearMonth: edu.is_current === 0 ? edu.end_year_month : null,
+            endYearMonth: edu.is_current === 0 ? edu.end_year_month : '',
             isCurrent: edu.is_current
         })
             .catch(err => {
