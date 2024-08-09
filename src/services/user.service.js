@@ -84,11 +84,11 @@ module.exports = {
             });
 
         // Step 5: Send confirmation email with account token
-        await mailGun.sendConfirmationEmail(user.email, token)
-            .catch(err => {
-                logger.error(err.message);
-                throw new Err('cannot send confirmation email', CODE.UNKNOWN_ERROR);
-            });
+        // await mailGun.sendConfirmationEmail(user.email, token)
+        //     .catch(err => {
+        //         logger.error(err.message);
+        //         throw new Err('cannot send confirmation email', CODE.UNKNOWN_ERROR);
+        //     });
 
         return {};
     },

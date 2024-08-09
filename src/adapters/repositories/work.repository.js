@@ -3,7 +3,7 @@ const { toISODate } = require('../../utils/common');
 
 module.exports = {
     getAll: async () => {
-        const query = `SELECT id, title, company_name, description, start_year_month, end_year_month, is_current, created_at, updated_at from work WHERE deleted = 0`;
+        const query = `SELECT id, title, company_name, description, start_year_month, end_year_month, is_current, created_at, updated_at from work WHERE deleted = 0 ORDER BY start_year_month DESC, is_current DESC, end_year_month DESC`;
         const results = await connectMysql(query);
         console.log(results);
 
