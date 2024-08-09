@@ -4,6 +4,7 @@ const userHdlr = require('../handlers/user.handler')
 const enquiryHdlr = require('../handlers/enquiry.handler')
 const workHdlr = require('../handlers/work.handler')
 const educationHdlr = require('../handlers/education.handler')
+const tokenHdlr = require('../handlers/token.handler')
 
 const router = express.Router();
 
@@ -23,6 +24,7 @@ router.delete('/users/:id', userHdlr.deleteUserById);
 
 router.post('/login', userHdlr.login);
 router.get('/verify-account', userHdlr.verifyAccount);
+router.get('/verify-user-session-token', tokenHdlr.verifyUserSessionToken);
 
 /*************************************************************
  *                       Enquiry Module
