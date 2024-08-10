@@ -7,26 +7,6 @@ module.exports = {
         }
         return str;
     },
-    isValidDate: (date) => {
-        const regex = /^(\d{4})(\/)(\d{2})$/;
-        if (date.match(regex) == null) {
-            return false;
-        }
-
-        const dateArr = date.split('/');
-        const year = Number(dateArr[0]);
-        const month = Number(dateArr[1]);
-
-        const currentYear = new Date().getFullYear();
-        if (year < 1900 || year > currentYear) {
-            return false;
-        }
-        if (month < 1 || month > 12) {
-            return false;
-        }
-
-        return true;
-    },
     toISODate: (d) => {
         const dateArr = d.split('/');
         const year = Number(dateArr[0]);
