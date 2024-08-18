@@ -89,8 +89,8 @@ module.exports = {
         if (!id) {
             throw new Err('id is required', CODE.INVALID_PARAM);
         }
-        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_year_month) {
-            throw new Err('degree, subject, school_name and start_year_month are required', CODE.INVALID_PARAM);
+        if (!edu.degree || !edu.subject || !edu.school_name || !edu.start_year || !edu.start_month) {
+            throw new Err('degree, subject, school_name, start_year and start_month are required', CODE.INVALID_PARAM);
         }
         if (edu.is_current !== 0 && edu.is_current !== 1) {
             throw new Err('is_current must be 0 or 1', CODE.INVALID_PARAM);
